@@ -6,7 +6,6 @@
 <body>
   <h1>Compartilhar Localização em Tempo Real</h1>
   <button onclick="iniciarCompartilhamento()">Iniciar Compartilhamento</button>
-  <button onclick="pararCompartilhamento()">Parar Compartilhamento</button>
 
   <script>
     let sharingInterval;
@@ -16,18 +15,10 @@
       if (navigator.geolocation) {
         isSharing = true;
         sharingInterval = setInterval(obterLocalizacao, 10000); // Atualiza a cada 10 segundos
-        setTimeout(pararCompartilhamento, 172800000); // Para o compartilhamento após 48 horas
         alert("Compartilhamento de localização iniciado.");
       } else {
         alert("Geolocalização não é suportada pelo seu navegador.");
       }
-    }
-
-    function pararCompartilhamento() {
-      clearInterval(sharingInterval);
-      isSharing = false;
-      console.log("Compartilhamento de localização parado.");
-      alert("Compartilhamento de localização parado.");
     }
 
     function obterLocalizacao() {
@@ -91,6 +82,13 @@
           alert("Um erro desconhecido ocorreu.");
           break;
       }
+    }
+
+    // Função para parar o compartilhamento chamada pelo AppSheet
+    function pararCompartilhamento() {
+      clearInterval(sharingInterval);
+      isSharing = false;
+      console.log("Compartilhamento de localização parado.");
     }
   </script>
 </body>
