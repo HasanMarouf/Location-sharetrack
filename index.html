@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Compartilhar Localização em Tempo Real</title>
+</head>
+<body>
+  <h1>Compartilhar Localização em Tempo Real</h1>
+  <button onclick="startSharing()">Iniciar Compartilhamento</button>
+
+  <script>
+    let sharingInterval;
+    let isSharing = false;
+
+    function startSharing() {
+      if (navigator.geolocation) {
+        isSharing = true;
+        sharingInterval = setInterval(getLocation, 10000); // Atualiza a cada 10 segundos
+        setTimeout(stopSharing, 172800000); // Para o compartilhamento após 48 horas
+        alert("Compartilhamento de localização iniciado.");
+      } else {
+        alert("Geolocalização não é suportada pelo seu navegador.");
+      }
+    }
+
+    function stopSharing() {
+      clearInterval(sharingInterval);
+      isSharing = false;
+      console.log("Compartilhamento de localização parado.");
+    }
+
+    function getLocation() {
+      if (navigator.geolocation && isSharing) {
+        navigator.geolocation.getCurrentPosition(sendPosition, showError);
+      }
+    }
+
+    function sendPosition(position) {
+      var latitude = position.coords.latitude;
+      var longitude = position.coords.longitude;
+      console.log(`Latitude: ${latitude}, Longitude: ${longitude}`); // Log para verificar coordenadas
+      var urlParams = new URLSearchParams(window.location.search);
+      var trackingID = urlParams.get('id');
+
+      // Envia a localização para o AppSheet
+      fetch('https://api.appsheet.com/api/v2/apps/ydogT-baJ3H-8qDrR-vRRJn-wIZUK-eQGim-XGtNo-5GuFs/tables/Tracking/Action', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'ApplicationAccessKey': '547878901'
+        },
+        body: JSON.stringify({
+          "Action": "Edit",
+          "Properties": {
+            "Locale": "en-US",
+            "Location": "Office",
+            "Timezone": "Pacific Standard Time"
+          },
+          "Rows": [
+            {
+              "TrackingID": trackingID,
+              "Latitude": latitude,
+              "Longitude": longitude,
+              "CurrentLocation": `${latitude}, ${longitude}`
+            }
+          ]
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Localização enviada com sucesso!', data); // Log para verificar resposta
+      })
+      .catch((error) => {
+        console.log('Erro ao enviar localização: ' + error);
+      });
+    }
+
+    function showError(error) {
+      switch(error.code) {
+        case error.PERMISSION_DENIED:
+          alert("Usuário negou a solicitação de geolocalização.");
+          break;
+        case error.POSITION_UNAVAILABLE:
+          alert("Informações de localização não estão disponíveis.");
+          break;
+        case error.TIMEOUT:
+          alert("A solicitação para obter a localização do usuário expirou.");
+          break;
+        case error.UNKNOWN_ERROR:
+          alert("Um erro desconhecido ocorreu.");
+          break;
+      }
+    }
+  </script>
+</body>
+</html>
