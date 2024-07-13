@@ -5,48 +5,50 @@
 </head>
 <body>
   <h1>Compartilhar Localização em Tempo Real</h1>
-  <button onclick="startSharing()">Iniciar Compartilhamento</button>
+  <button onclick="iniciarCompartilhamento()">Iniciar Compartilhamento</button>
+  <button onclick="pararCompartilhamento()">Parar Compartilhamento</button>
 
   <script>
     let sharingInterval;
     let isSharing = false;
 
-    function startSharing() {
+    function iniciarCompartilhamento() {
       if (navigator.geolocation) {
         isSharing = true;
-        sharingInterval = setInterval(getLocation, 10000); // Atualiza a cada 10 segundos
-        setTimeout(stopSharing, 172800000); // Para o compartilhamento após 48 horas
+        sharingInterval = setInterval(obterLocalizacao, 10000); // Atualiza a cada 10 segundos
+        setTimeout(pararCompartilhamento, 172800000); // Para o compartilhamento após 48 horas
         alert("Compartilhamento de localização iniciado.");
       } else {
         alert("Geolocalização não é suportada pelo seu navegador.");
       }
     }
 
-    function stopSharing() {
+    function pararCompartilhamento() {
       clearInterval(sharingInterval);
       isSharing = false;
       console.log("Compartilhamento de localização parado.");
+      alert("Compartilhamento de localização parado.");
     }
 
-    function getLocation() {
+    function obterLocalizacao() {
       if (navigator.geolocation && isSharing) {
-        navigator.geolocation.getCurrentPosition(sendPosition, showError);
+        navigator.geolocation.getCurrentPosition(enviarPosicao, mostrarErro);
       }
     }
 
-    function sendPosition(position) {
-      var latitude = position.coords.latitude;
-      var longitude = position.coords.longitude;
+    function enviarPosicao(posicao) {
+      var latitude = posicao.coords.latitude;
+      var longitude = posicao.coords.longitude;
       console.log(`Latitude: ${latitude}, Longitude: ${longitude}`); // Log para verificar coordenadas
       var urlParams = new URLSearchParams(window.location.search);
       var trackingID = urlParams.get('id');
 
       // Envia a localização para o AppSheet
-      fetch('https://api.appsheet.com/api/v2/apps/ydogT-baJ3H-8qDrR-vRRJn-wIZUK-eQGim-XGtNo-5GuFs/tables/Tracking/Action', {
+      fetch('https://api.appsheet.com/api/v2/apps/493c4918-89d9-42e6-9610-f8166c5ba327/tables/Rastreamento/Action', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'ApplicationAccessKey': '547878901'
+          'ApplicationAccessKey': 'V2-taiiP-b2ZAV-C5OCE-C6Owa-wA8UI-UcfmX-EE8bi-uItQH'
         },
         body: JSON.stringify({
           "Action": "Edit",
@@ -74,18 +76,18 @@
       });
     }
 
-    function showError(error) {
-      switch(error.code) {
-        case error.PERMISSION_DENIED:
+    function mostrarErro(erro) {
+      switch(erro.code) {
+        case erro.PERMISSION_DENIED:
           alert("Usuário negou a solicitação de geolocalização.");
           break;
-        case error.POSITION_UNAVAILABLE:
+        case erro.POSITION_UNAVAILABLE:
           alert("Informações de localização não estão disponíveis.");
           break;
-        case error.TIMEOUT:
+        case erro.TIMEOUT:
           alert("A solicitação para obter a localização do usuário expirou.");
           break;
-        case error.UNKNOWN_ERROR:
+        case erro.UNKNOWN_ERROR:
           alert("Um erro desconhecido ocorreu.");
           break;
       }
