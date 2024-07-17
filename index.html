@@ -27,9 +27,9 @@
       }
     }
 
-    function enviarPosicao(posicao) {
-      var latitude = posicao.coords.latitude;
-      var longitude = posicao.coords.longitude;
+    function enviarPosicao(position) {
+      var latitude = position.coords.latitude;
+      var longitude = position.coords.longitude;
       console.log(`Latitude: ${latitude}, Longitude: ${longitude}`); // Log para verificar coordenadas
       var urlParams = new URLSearchParams(window.location.search);
       var trackingID = urlParams.get('id');
@@ -39,13 +39,12 @@
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'ApplicationAccessKey': 'V2-taiiP-b2ZAV-C5OCE-C6Owa-wA8UI-UcfmX-EE8bi-uItQH'
+          'ApplicationAccessKey': 'V2-taiiP-b2ZAV-C5OCE-C6Owa-wA8UI-UcfmX-EE8bi-ultQH'
         },
         body: JSON.stringify({
           "Action": "Edit",
           "Properties": {
             "Locale": "en-US",
-            "Location": "Office",
             "Timezone": "Pacific Standard Time"
           },
           "Rows": [
@@ -67,18 +66,18 @@
       });
     }
 
-    function mostrarErro(erro) {
-      switch(erro.code) {
-        case erro.PERMISSION_DENIED:
+    function mostrarErro(error) {
+      switch(error.code) {
+        case error.PERMISSION_DENIED:
           alert("Usuário negou a solicitação de geolocalização.");
           break;
-        case erro.POSITION_UNAVAILABLE:
+        case error.POSITION_UNAVAILABLE:
           alert("Informações de localização não estão disponíveis.");
           break;
-        case erro.TIMEOUT:
+        case error.TIMEOUT:
           alert("A solicitação para obter a localização do usuário expirou.");
           break;
-        case erro.UNKNOWN_ERROR:
+        case error.UNKNOWN_ERROR:
           alert("Um erro desconhecido ocorreu.");
           break;
       }
